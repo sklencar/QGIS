@@ -408,6 +408,14 @@ QgsIdentifyResultsDialog::QgsIdentifyResultsDialog( QgsMapCanvas *canvas, QWidge
   connect( mOpenFormAction, &QAction::triggered, this, &QgsIdentifyResultsDialog::featureForm );
   connect( mClearResultsAction, &QAction::triggered, this, &QgsIdentifyResultsDialog::clear );
   connect( mHelpToolButton, &QAbstractButton::clicked, this, &QgsIdentifyResultsDialog::showHelp );
+
+  // TODO @vsklencar
+  connect( mActionSelectFeatures, &QAbstractButton::clicked, this, &QgsIdentifyResultsDialog::showHelp );
+  connect( mActionSelectPolygon, &QAbstractButton::clicked, this, &QgsIdentifyResultsDialog::showHelp );
+  connect( mActionSelectFreehand, &QAbstractButton::clicked, this, &QgsIdentifyResultsDialog::showHelp );
+  connect( mActionSelectRadius, &QAbstractButton::clicked, this, &QgsIdentifyResultsDialog::showHelp );
+
+
 }
 
 QgsIdentifyResultsDialog::~QgsIdentifyResultsDialog()
