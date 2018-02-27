@@ -42,6 +42,16 @@ class APP_EXPORT QgsMapToolIdentifyAction : public QgsMapToolIdentify
     Q_OBJECT
 
   public:
+
+    enum IdentifySelection
+    {
+        SelectFeatures = 0,
+        SelectPolygon = 1,
+        SelectFreehand = 2,
+        SelectRadius = 3
+    };
+    Q_ENUM( IdentifySelection )
+
     QgsMapToolIdentifyAction( QgsMapCanvas *canvas );
 
     ~QgsMapToolIdentifyAction() override;
@@ -58,6 +68,8 @@ class APP_EXPORT QgsMapToolIdentifyAction : public QgsMapToolIdentify
     void activate() override;
 
     void deactivate() override;
+
+    void setSelectPolygonMode();
 
   public slots:
     void handleCopyToClipboard( QgsFeatureStore & );
@@ -79,6 +91,8 @@ class APP_EXPORT QgsMapToolIdentifyAction : public QgsMapToolIdentify
     QgsUnitTypes::DistanceUnit displayDistanceUnits() const override;
     QgsUnitTypes::AreaUnit displayAreaUnits() const override;
     void setClickContextScope( const QgsPointXY &point );
+
+    IdentifySelection mSelectionMode;
 
     friend class TestQgsMapToolIdentifyAction;
 };

@@ -27,7 +27,9 @@
 #include "qgsfeaturestore.h"
 #include "qgsgeometry.h"
 #include "qgshighlight.h"
+#include "qgsmaptoolidentifyaction.h"
 #include "qgsidentifyresultsdialog.h"
+#include "qgsmaptoolidentifyaction.h"
 #include "qgslogger.h"
 #include "qgsmapcanvas.h"
 #include "qgsmaplayeractionregistry.h"
@@ -313,6 +315,7 @@ void QgsIdentifyResultsWebViewItem::loadFinished( bool ok )
 QgsIdentifyResultsDialog::QgsIdentifyResultsDialog( QgsMapCanvas *canvas, QWidget *parent, Qt::WindowFlags f )
   : QDialog( parent, f )
   , mCanvas( canvas )
+  , mSelectionMode (0)
 {
   setupUi( this );
   connect( cmbIdentifyMode, static_cast<void ( QComboBox::* )( int )>( &QComboBox::currentIndexChanged ), this, &QgsIdentifyResultsDialog::cmbIdentifyMode_currentIndexChanged );
@@ -410,12 +413,12 @@ QgsIdentifyResultsDialog::QgsIdentifyResultsDialog( QgsMapCanvas *canvas, QWidge
   connect( mHelpToolButton, &QAbstractButton::clicked, this, &QgsIdentifyResultsDialog::showHelp );
 
   // TODO @vsklencar
-  connect( mActionSelectFeatures, &QAbstractButton::clicked, this, &QgsIdentifyResultsDialog::showHelp );
-  connect( mActionSelectPolygon, &QAbstractButton::clicked, this, &QgsIdentifyResultsDialog::showHelp );
-  connect( mActionSelectFreehand, &QAbstractButton::clicked, this, &QgsIdentifyResultsDialog::showHelp );
-  connect( mActionSelectRadius, &QAbstractButton::clicked, this, &QgsIdentifyResultsDialog::showHelp );
-
-
+  // change to specififv identifyToolSelectActions on QAction create
+  connect( mActionSelectFeatures, &QAction::triggered, this, &QgsIdentifyResultsDialog::setFeaturesSelectionMode );
+  //connect( mActionSelectPolygon, &QAction::triggered, this, &QgsMapToolIdentifyAction::setSelectPolygonMode);
+  connect( mActionSelectPolygon, &QAction::triggered, this, &QgsIdentifyResultsDialog::setPolygonSelectionMode );
+  connect( mActionSelectFreehand, &QAction::triggered, this, &QgsIdentifyResultsDialog::setFreehandSelectionMode );
+  connect( mActionSelectRadius, &QAction::triggered, this, &QgsIdentifyResultsDialog::setRadiusSelectionMode );
 }
 
 QgsIdentifyResultsDialog::~QgsIdentifyResultsDialog()
@@ -1998,6 +2001,57 @@ void QgsIdentifyResultsDialog::showHelp()
 {
   QgsHelp::openHelp( QStringLiteral( "introduction/general_tools.html#identify" ) );
 }
+
+void QgsIdentifyResultsDialog::setFeaturesSelectionMode()
+{
+    selectModeBtn->setDefaultAction(mActionSelectFeatures);
+    mSelectionMode = 0;
+}
+
+//// TODO @vsklencar
+void QgsIdentifyResultsDialog::setPolygonSelectionMode()
+{
+    // set default
+    selectModeBtn->setDefaultAction(mActionSelectPolygon);
+    mSelectionMode = 1;
+}
+
+void QgsIdentifyResultsDialog::setFreehandSelectionMode()
+{
+    selectModeBtn->setDefaultAction(mActionSelectFreehand);
+    mSelectionMode = 2;
+}
+
+void QgsIdentifyResultsDialog::setRadiusSelectionMode()
+{
+    selectModeBtn->setDefaultAction(mActionSelectRadius);
+    mSelectionMode = 3;
+}
+
+QgsMapToolIdentifyAction::IdentifySelection QgsIdentifyResultsDialog::selectionMode()
+{
+    QgsMapToolIdentifyAction::IdentifySelection mode;
+    switch ( mSelectionMode )
+    {
+      case 0:
+        mode = QgsMapToolIdentifyAction::SelectFeatures;
+        break;
+      case 1:
+        mode = QgsMapToolIdentifyAction::SelectPolygon;
+        break;
+      case 2:
+        mode = QgsMapToolIdentifyAction::SelectFreehand;
+        break;
+      case 3:
+        mode = QgsMapToolIdentifyAction::SelectRadius;
+        break;
+      default:
+        mode = QgsMapToolIdentifyAction::SelectFeatures;
+    }
+
+    return mode;
+}
+
 
 void QgsIdentifyResultsDialog::setExpressionContextScope( const QgsExpressionContextScope &scope )
 {
