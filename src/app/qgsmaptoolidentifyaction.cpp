@@ -187,12 +187,15 @@ void QgsMapToolIdentifyAction::handleOnCanvasRelease(QgsMapMouseEvent *e)
 
 void QgsMapToolIdentifyAction::canvasReleaseEvent( QgsMapMouseEvent *e )
 {
-
-    //if ( !mDragging )
-    // TODO @vsklencar handle case when !mDragging
     if ( !mDragging )
     {
-        //mSelectRect
+        QPoint point = e->pos();
+        //QgsMapToolSelectUtils::expandSelectRectangle( mSelectRect, vlayer, e->pos() );
+        int boxSize = 1; //10/100/1000??
+        mSelectRect.setLeft( (int) (point.x() - boxSize) );
+        mSelectRect.setRight( point.x() + boxSize );
+        mSelectRect.setTop( point.y() - boxSize );
+        mSelectRect.setBottom( point.y() + boxSize );
     }
     else {
       // Set valid values for rectangle's width and height
