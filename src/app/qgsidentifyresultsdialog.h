@@ -283,7 +283,7 @@ class APP_EXPORT QgsIdentifyResultsDialog: public QDialog, private Ui::QgsIdenti
 
     void showHelp();
 
-    int mSelectionMode;
+    QgsMapToolIdentifyAction::IdentifySelection mSelectionMode;
 
     void setFeaturesSelectionMode();
     void setPolygonSelectionMode();

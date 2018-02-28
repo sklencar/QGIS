@@ -126,10 +126,7 @@ void QgsMapToolIdentifyAction::canvasReleaseEvent( QgsMapMouseEvent *e )
   identifyMenu()->setExecWithSingleResult( extendedMenu );
   identifyMenu()->setShowFeatureActions( extendedMenu );
   IdentifyMode mode = extendedMenu ? LayerSelection : DefaultQgsSetting;
-  // TODO @vsklencar set selectMode
-
   mSelectionMode = mResultsDialog->selectionMode();
-  //this->setSelectionMode(selectionMode);
 
   QList<IdentifyResult> results = QgsMapToolIdentify::identify( e->x(), e->y(), mode );
 
