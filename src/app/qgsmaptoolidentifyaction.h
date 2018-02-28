@@ -28,6 +28,7 @@ class QgsMapLayer;
 class QgsRasterLayer;
 class QgsVectorLayer;
 class QgsFeatureStore;
+class QgsRubberBand;
 
 /**
   \brief Map tool for identifying features layers and showing results
@@ -71,7 +72,9 @@ class APP_EXPORT QgsMapToolIdentifyAction : public QgsMapToolIdentify
 
     void setSelectPolygonMode();
 
-  public slots:
+    void handleOnCanvasRelease(QgsMapMouseEvent *e);
+
+public slots:
     void handleCopyToClipboard( QgsFeatureStore & );
     void handleChangedRasterResults( QList<QgsMapToolIdentify::IdentifyResult> &results );
 
@@ -87,6 +90,15 @@ class APP_EXPORT QgsMapToolIdentifyAction : public QgsMapToolIdentify
     QPointer<QgsIdentifyResultsDialog> mResultsDialog;
 
     QgsIdentifyResultsDialog *resultsDialog();
+
+    //! Flag to indicate a map canvas drag operation is taking place
+    bool mDragging;
+
+    QgsRubberBand *mRubberBand = nullptr;
+
+    QColor mFillColor;
+
+    QColor mStrokeColor;
 
     QgsUnitTypes::DistanceUnit displayDistanceUnits() const override;
     QgsUnitTypes::AreaUnit displayAreaUnits() const override;

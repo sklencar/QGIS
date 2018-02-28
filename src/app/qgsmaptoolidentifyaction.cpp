@@ -28,12 +28,14 @@
 #include "qgsmaptopixel.h"
 #include "qgsmessageviewer.h"
 #include "qgsmaptoolidentifyaction.h"
+#include "qgsmaptoolselectutils.h"
 #include "qgsrasterlayer.h"
 #include "qgscoordinatereferencesystem.h"
 #include "qgsvectordataprovider.h"
 #include "qgsvectorlayer.h"
 #include "qgsproject.h"
 #include "qgsrenderer.h"
+#include "qgsrubberband.h"
 #include "qgsunittypes.h"
 #include "qgsstatusbar.h"
 #include "qgsactionscoperegistry.h"
@@ -55,6 +57,11 @@ QgsMapToolIdentifyAction::QgsMapToolIdentifyAction( QgsMapCanvas *canvas )
   QgsMapLayerAction *attrTableAction = new QgsMapLayerAction( tr( "Show attribute table" ), mIdentifyMenu, QgsMapLayer::VectorLayer, QgsMapLayerAction::MultipleFeatures );
   connect( attrTableAction, &QgsMapLayerAction::triggeredForFeatures, this, &QgsMapToolIdentifyAction::showAttributeTable );
   identifyMenu()->addCustomAction( attrTableAction );
+
+  // TODO @vsklencar refactor with QgsMapToolSelectRectangle
+  mRubberBand = nullptr;
+  mFillColor = QColor( 254, 178, 76, 63 );
+  mStrokeColor = QColor( 254, 58, 29, 100 );
   //connect( mResultsDialog->mActionSelectPolygon, &QAction::triggered, this, &QgsMapToolIdentifyAction::setSelectPolygonMode);
 }
 
@@ -100,63 +107,115 @@ void QgsMapToolIdentifyAction::showAttributeTable( QgsMapLayer *layer, const QLi
   tableDialog->show();
 }
 
+// TODO @vsklencar refactor with QgsMapToolSelectRectangle
 void QgsMapToolIdentifyAction::canvasMoveEvent( QgsMapMouseEvent *e )
 {
-  Q_UNUSED( e );
+    //Q_UNUSED( e );
+    if ( e->buttons() != Qt::LeftButton )
+        return;
+
+    if ( !mDragging )
+    {
+        mDragging = true;
+        mSelectRect.setTopLeft( e->pos() );
+    }
+    mSelectRect.setBottomRight( e->pos() );
+    QgsMapToolSelectUtils::setRubberBand( mCanvas, mSelectRect, mRubberBand );
 }
 
 void QgsMapToolIdentifyAction::canvasPressEvent( QgsMapMouseEvent *e )
 {
-  Q_UNUSED( e );
+    Q_UNUSED( e );
+    mSelectRect.setRect( 0, 0, 0, 0 );
+    delete mRubberBand;
+    mRubberBand = new QgsRubberBand( mCanvas, QgsWkbTypes::PolygonGeometry );
+    mRubberBand->setFillColor( mFillColor );
+    mRubberBand->setStrokeColor( mStrokeColor );
+}
+
+void QgsMapToolIdentifyAction::handleOnCanvasRelease(QgsMapMouseEvent *e)
+{
+    resultsDialog()->clear();
+    connect( this, &QgsMapToolIdentifyAction::identifyProgress, QgisApp::instance(), &QgisApp::showProgress );
+    connect( this, &QgsMapToolIdentifyAction::identifyMessage, QgisApp::instance(), &QgisApp::showStatusMessage );
+
+    setClickContextScope( toMapCoordinates( e->pos() ) );
+
+    identifyMenu()->setResultsIfExternalAction( false );
+
+    // enable the right click for extended menu so it behaves as a contextual menu
+    // this would be removed when a true contextual menu is brought in QGIS
+    bool extendedMenu = e->modifiers() == Qt::ShiftModifier || e->button() == Qt::RightButton;
+    identifyMenu()->setExecWithSingleResult( extendedMenu );
+    identifyMenu()->setShowFeatureActions( extendedMenu );
+    IdentifyMode mode = extendedMenu ? LayerSelection : DefaultQgsSetting;
+    mSelectionMode = mResultsDialog->selectionMode();
+
+    // TODO @vsklencar use mSelectRect
+    // mLastPolygon = mSelectRect.bottomLeft();
+
+    QList<IdentifyResult> results = QgsMapToolIdentify::identify( e->x(), e->y(), mode );
+
+    disconnect( this, &QgsMapToolIdentifyAction::identifyProgress, QgisApp::instance(), &QgisApp::showProgress );
+    disconnect( this, &QgsMapToolIdentifyAction::identifyMessage, QgisApp::instance(), &QgisApp::showStatusMessage );
+
+    if ( results.isEmpty() )
+    {
+      resultsDialog()->clear();
+      QgisApp::instance()->statusBarIface()->showMessage( tr( "No features at this position found." ) );
+    }
+    else
+    {
+      // Show the dialog before items are inserted so that items can resize themselves
+      // according to dialog size also the first time, see also #9377
+      if ( results.size() != 1 || !QgsSettings().value( QStringLiteral( "/Map/identifyAutoFeatureForm" ), false ).toBool() )
+        resultsDialog()->QDialog::show();
+
+      QList<IdentifyResult>::const_iterator result;
+      for ( result = results.constBegin(); result != results.constEnd(); ++result )
+      {
+        resultsDialog()->addFeature( *result );
+      }
+
+      // Call QgsIdentifyResultsDialog::show() to adjust with items
+      resultsDialog()->show();
+    }
+
+    // update possible view modes
+    resultsDialog()->updateViewModes();
 }
 
 void QgsMapToolIdentifyAction::canvasReleaseEvent( QgsMapMouseEvent *e )
 {
-  resultsDialog()->clear();
-  connect( this, &QgsMapToolIdentifyAction::identifyProgress, QgisApp::instance(), &QgisApp::showProgress );
-  connect( this, &QgsMapToolIdentifyAction::identifyMessage, QgisApp::instance(), &QgisApp::showStatusMessage );
 
-  setClickContextScope( toMapCoordinates( e->pos() ) );
-
-  identifyMenu()->setResultsIfExternalAction( false );
-
-  // enable the right click for extended menu so it behaves as a contextual menu
-  // this would be removed when a true contextual menu is brought in QGIS
-  bool extendedMenu = e->modifiers() == Qt::ShiftModifier || e->button() == Qt::RightButton;
-  identifyMenu()->setExecWithSingleResult( extendedMenu );
-  identifyMenu()->setShowFeatureActions( extendedMenu );
-  IdentifyMode mode = extendedMenu ? LayerSelection : DefaultQgsSetting;
-  mSelectionMode = mResultsDialog->selectionMode();
-
-  QList<IdentifyResult> results = QgsMapToolIdentify::identify( e->x(), e->y(), mode );
-
-  disconnect( this, &QgsMapToolIdentifyAction::identifyProgress, QgisApp::instance(), &QgisApp::showProgress );
-  disconnect( this, &QgsMapToolIdentifyAction::identifyMessage, QgisApp::instance(), &QgisApp::showStatusMessage );
-
-  if ( results.isEmpty() )
-  {
-    resultsDialog()->clear();
-    QgisApp::instance()->statusBarIface()->showMessage( tr( "No features at this position found." ) );
-  }
-  else
-  {
-    // Show the dialog before items are inserted so that items can resize themselves
-    // according to dialog size also the first time, see also #9377
-    if ( results.size() != 1 || !QgsSettings().value( QStringLiteral( "/Map/identifyAutoFeatureForm" ), false ).toBool() )
-      resultsDialog()->QDialog::show();
-
-    QList<IdentifyResult>::const_iterator result;
-    for ( result = results.constBegin(); result != results.constEnd(); ++result )
+    //if ( !mDragging )
+    // TODO @vsklencar handle case when !mDragging
+    if ( !mDragging )
     {
-      resultsDialog()->addFeature( *result );
+        //mSelectRect
+    }
+    else {
+      // Set valid values for rectangle's width and height
+      if ( mSelectRect.width() == 1 )
+      {
+        mSelectRect.setLeft( mSelectRect.left() + 1 );
+      }
+      if ( mSelectRect.height() == 1 )
+      {
+        mSelectRect.setBottom( mSelectRect.bottom() + 1 );
+      }
     }
 
-    // Call QgsIdentifyResultsDialog::show() to adjust with items
-    resultsDialog()->show();
-  }
+    if ( mRubberBand )
+    {
+      QgsMapToolSelectUtils::setRubberBand( mCanvas, mSelectRect, mRubberBand );
+      delete mRubberBand;
+      mRubberBand = nullptr;
+    }
 
-  // update possible view modes
-  resultsDialog()->updateViewModes();
+    mDragging = false;
+
+  handleOnCanvasRelease(e);
 }
 
 void QgsMapToolIdentifyAction::handleChangedRasterResults( QList<IdentifyResult> &results )
