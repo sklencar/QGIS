@@ -191,9 +191,7 @@ bool QgsMapToolIdentify::identifyLayer( QList<IdentifyResult> *results, QgsMapLa
       QPoint point1 = mSelectRect.topLeft();
       QPoint point2 = mSelectRect.bottomRight();
 
-      QgsPointXY topLeftTrans = mCanvas->getCoordinateTransform()->toMapCoordinates( point1.x(), point1.y() );
-      QgsPointXY bottomRightTrans = mCanvas->getCoordinateTransform()->toMapCoordinates( point2.x(), point2.y() );
-      QgsRectangle rectangle = QgsRectangle(topLeftTrans.x(), topLeftTrans.y(), bottomRightTrans.x(), bottomRightTrans.y());
+      QgsRectangle rectangle = QgsRectangle(point1.x(), point1.y(), point2.x(), point2.y());
       //QgsRectangle rectangle = QgsRectangle(QRectF(mSelectRect));
 
     //return identifyVectorLayer( results, qobject_cast<QgsVectorLayer *>( layer ), point );

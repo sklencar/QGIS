@@ -94,19 +94,40 @@ public slots:
     //! Flag to indicate a map canvas drag operation is taking place
     bool mDragging;
 
+    bool mActive = false;
+
     QgsRubberBand *mRubberBand = nullptr;
 
     QColor mFillColor;
 
     QColor mStrokeColor;
 
+    IdentifySelection mSelectionMode;
+
+    bool mJustFinishedSelection = false;
+
+    //! Center point for the radius
+    QgsPointXY mRadiusCenter;
+
     QgsUnitTypes::DistanceUnit displayDistanceUnits() const override;
     QgsUnitTypes::AreaUnit displayAreaUnits() const override;
     void setClickContextScope( const QgsPointXY &point );
 
-    IdentifySelection mSelectionMode;
+    void selectFeaturesMoveEvent(QgsMapMouseEvent *e);
+    void selectFeaturesReleaseEvent(QgsMapMouseEvent *e);
+
+    void selectPolygonMoveEvent(QgsMapMouseEvent *e);
+
+    void selectFreehandMoveEvent(QgsMapMouseEvent *e);
+    void selectFreehandReleaseEvent(QgsMapMouseEvent *e);
+
+    void selectRadiusMoveEvent(QgsMapMouseEvent *e);
+    void selectRadiusReleaseEvent(QgsMapMouseEvent *e);
+
+    void updateRadiusFromEdge( QgsPointXY &radiusEdge );
 
     friend class TestQgsMapToolIdentifyAction;
+
 };
 
 #endif
