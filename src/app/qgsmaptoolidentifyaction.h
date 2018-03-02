@@ -117,6 +117,7 @@ public slots:
     void selectFeaturesReleaseEvent(QgsMapMouseEvent *e);
 
     void selectPolygonMoveEvent(QgsMapMouseEvent *e);
+    void selectPolygonReleaseEvent(QgsMapMouseEvent *e);
 
     void selectFreehandMoveEvent(QgsMapMouseEvent *e);
     void selectFreehandReleaseEvent(QgsMapMouseEvent *e);
@@ -126,8 +127,9 @@ public slots:
 
     void updateRadiusFromEdge( QgsPointXY &radiusEdge );
 
-    friend class TestQgsMapToolIdentifyAction;
+    void keyReleaseEvent( QKeyEvent *e );
 
+    friend class TestQgsMapToolIdentifyAction;
 };
 
 #endif

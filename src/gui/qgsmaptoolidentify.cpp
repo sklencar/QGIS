@@ -190,9 +190,7 @@ bool QgsMapToolIdentify::identifyLayer( QList<IdentifyResult> *results, QgsMapLa
   {
       QPoint point1 = mSelectRect.topLeft();
       QPoint point2 = mSelectRect.bottomRight();
-
       QgsRectangle rectangle = QgsRectangle(point1.x(), point1.y(), point2.x(), point2.y());
-      //QgsRectangle rectangle = QgsRectangle(QRectF(mSelectRect));
 
     //return identifyVectorLayer( results, qobject_cast<QgsVectorLayer *>( layer ), point );
     return identifyVectorLayer( results, qobject_cast<QgsVectorLayer *>( layer ), rectangle );
@@ -203,7 +201,6 @@ bool QgsMapToolIdentify::identifyLayer( QList<IdentifyResult> *results, QgsMapLa
   }
 }
 
-// TODO @vsklencar
 bool QgsMapToolIdentify::identifyVectorLayer( QList<IdentifyResult> *results, QgsVectorLayer *layer, const QgsRectangle &rectangle)
 {
 
@@ -231,16 +228,21 @@ bool QgsMapToolIdentify::identifyVectorLayer( QList<IdentifyResult> *results, Qg
     // and then click somewhere off the globe, an exception will be thrown.
     try
     {
-      // TODO @vsklencar - possibly delete and use just rectangle
       QgsRectangle r;
       r = toLayerCoordinates( layer, rectangle );
-
 
       QgsFeatureIterator fit = layer->getFeatures( QgsFeatureRequest().setFilterRect( r ).setFlags( QgsFeatureRequest::ExactIntersect ) );
       QgsFeature f;
       while ( fit.nextFeature( f ) )
-        // TODO @vsklencar - intesection geom test
-        featureList << QgsFeature( f );
+      {
+          QgsDebugMsg( "Feature geom isvalid: " + QString::number(f.geometry().isGeosValid()) );
+          QgsDebugMsg( "mSelectionGeometry is valid: " + QString::number(mSelectionGeometry.isGeosValid()) );
+          QgsDebugMsg( "mSelectionGeometry is valid: " + mSelectionGeometry.asWkb() );
+
+          //if (f.geometry().intersects(mSelectionGeometry))
+          if (mSelectionGeometry.intersects(f.geometry()))
+            featureList << QgsFeature( f );
+      }
     }
     catch ( QgsCsException &cse )
     {
@@ -292,10 +294,9 @@ bool QgsMapToolIdentify::identifyVectorLayer( QList<IdentifyResult> *results, Qg
 
     QApplication::restoreOverrideCursor();
     return featureCount > 0;
-
-
-    return false;
 }
+
+// TODO @vsklencar @depricated
 bool QgsMapToolIdentify::identifyVectorLayer( QList<IdentifyResult> *results, QgsVectorLayer *layer, const QgsPointXY &point )
 {
   if ( !layer || !layer->isSpatial() )
@@ -334,12 +335,9 @@ bool QgsMapToolIdentify::identifyVectorLayer( QList<IdentifyResult> *results, Qg
 
     r = toLayerCoordinates( layer, r );
 
-    // TODO @vsklencar according selectionMode find/filter features
     QgsFeatureIterator fit = layer->getFeatures( QgsFeatureRequest().setFilterRect( r ).setFlags( QgsFeatureRequest::ExactIntersect ) );
     QgsFeature f;
     while ( fit.nextFeature( f ) )
-
-      // TODO @vsklencar - intesection geom test
       featureList << QgsFeature( f );
   }
   catch ( QgsCsException &cse )

@@ -2014,21 +2014,18 @@ void QgsIdentifyResultsDialog::setPolygonSelectionMode()
     // set default
     selectModeBtn->setDefaultAction(mActionSelectPolygon);
     mSelectionMode = QgsMapToolIdentifyAction::SelectPolygon;
-    //mSelectionMode = 1;
 }
 
 void QgsIdentifyResultsDialog::setFreehandSelectionMode()
 {
     selectModeBtn->setDefaultAction(mActionSelectFreehand);
     mSelectionMode = QgsMapToolIdentifyAction::SelectFreehand;
-    //mSelectionMode = 2;
 }
 
 void QgsIdentifyResultsDialog::setRadiusSelectionMode()
 {
     selectModeBtn->setDefaultAction(mActionSelectRadius);
     mSelectionMode = QgsMapToolIdentifyAction::SelectRadius;
-    //mSelectionMode = 3;
 }
 
 QgsMapToolIdentifyAction::IdentifySelection QgsIdentifyResultsDialog::selectionMode()

@@ -178,6 +178,9 @@ class GUI_EXPORT QgsMapToolIdentify : public QgsMapTool
     //! stores actual select rect
     QRect mSelectRect;
 
+    //! stores exact selection geometry
+    QgsGeometry mSelectionGeometry;
+
   private:
 
     /**
