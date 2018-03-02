@@ -109,6 +109,8 @@ public slots:
     //! Center point for the radius
     QgsPointXY mRadiusCenter;
 
+    QPoint mInitDraggPos;
+
     QgsUnitTypes::DistanceUnit displayDistanceUnits() const override;
     QgsUnitTypes::AreaUnit displayAreaUnits() const override;
     void setClickContextScope( const QgsPointXY &point );

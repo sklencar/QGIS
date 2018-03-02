@@ -122,7 +122,7 @@ QList<QgsMapToolIdentify::IdentifyResult> QgsMapToolIdentify::identify( int x, i
 
     QApplication::setOverrideCursor( Qt::WaitCursor );
 
-    // TODO @vsklencar must be there 2 version - mLastPolygon and mLastPoint??
+    // TODO @vsklencar two version functions??
     //identifyLayer( &results, layer, mLastPolygon, mLastExtent, mLastMapUnitsPerPixel, layerType );
     identifyLayer( &results, layer, mLastPoint, mLastExtent, mLastMapUnitsPerPixel, layerType );
   }
@@ -192,7 +192,6 @@ bool QgsMapToolIdentify::identifyLayer( QList<IdentifyResult> *results, QgsMapLa
       QPoint point2 = mSelectRect.bottomRight();
       QgsRectangle rectangle = QgsRectangle(point1.x(), point1.y(), point2.x(), point2.y());
 
-    //return identifyVectorLayer( results, qobject_cast<QgsVectorLayer *>( layer ), point );
     return identifyVectorLayer( results, qobject_cast<QgsVectorLayer *>( layer ), rectangle );
   }
   else
@@ -235,11 +234,6 @@ bool QgsMapToolIdentify::identifyVectorLayer( QList<IdentifyResult> *results, Qg
       QgsFeature f;
       while ( fit.nextFeature( f ) )
       {
-          QgsDebugMsg( "Feature geom isvalid: " + QString::number(f.geometry().isGeosValid()) );
-          QgsDebugMsg( "mSelectionGeometry is valid: " + QString::number(mSelectionGeometry.isGeosValid()) );
-          QgsDebugMsg( "mSelectionGeometry is valid: " + mSelectionGeometry.asWkb() );
-
-          //if (f.geometry().intersects(mSelectionGeometry))
           if (mSelectionGeometry.intersects(f.geometry()))
             featureList << QgsFeature( f );
       }
@@ -277,7 +271,7 @@ bool QgsMapToolIdentify::identifyVectorLayer( QList<IdentifyResult> *results, Qg
 
       featureCount++;
 
-      // TODO
+      // TODO @vsklencar
       //derivedAttributes.unite( featureDerivedAttributes( &( *f_it ), layer, toLayerCoordinates( layer, point ) ) );
 
       derivedAttributes.insert( tr( "feature id" ), fid < 0 ? tr( "new feature" ) : FID_TO_STRING( fid ) );
@@ -296,7 +290,7 @@ bool QgsMapToolIdentify::identifyVectorLayer( QList<IdentifyResult> *results, Qg
     return featureCount > 0;
 }
 
-// TODO @vsklencar @depricated
+// TODO @vsklencar -> used in QgsMapToolIdentifyFeature
 bool QgsMapToolIdentify::identifyVectorLayer( QList<IdentifyResult> *results, QgsVectorLayer *layer, const QgsPointXY &point )
 {
   if ( !layer || !layer->isSpatial() )

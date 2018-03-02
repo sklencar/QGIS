@@ -63,7 +63,6 @@ QgsMapToolIdentifyAction::QgsMapToolIdentifyAction( QgsMapCanvas *canvas )
   mFillColor = QColor( 254, 178, 76, 63 );
   mStrokeColor = QColor( 254, 58, 29, 100 );
   mSelectionMode = QgsMapToolIdentifyAction::SelectFeatures;
-  //connect( mResultsDialog->mActionSelectPolygon, &QAction::triggered, this, &QgsMapToolIdentifyAction::setSelectPolygonMode);
 }
 
 QgsMapToolIdentifyAction::~QgsMapToolIdentifyAction()
@@ -83,6 +82,7 @@ QgsIdentifyResultsDialog *QgsMapToolIdentifyAction::resultsDialog()
 
     connect( mResultsDialog.data(), static_cast<void ( QgsIdentifyResultsDialog::* )( QgsRasterLayer * )>( &QgsIdentifyResultsDialog::formatChanged ), this, &QgsMapToolIdentify::formatChanged );
     connect( mResultsDialog.data(), &QgsIdentifyResultsDialog::copyToClipboard, this, &QgsMapToolIdentifyAction::handleCopyToClipboard );
+    // todo connect slectionMode change
     //connect( mResultsDialog->mActionSelectPolygon, &QAction::triggered, this, &QgsMapToolIdentifyAction::setSelectPolygonMode);
   }
 
@@ -262,6 +262,7 @@ void QgsMapToolIdentifyAction::canvasPressEvent( QgsMapMouseEvent *e )
         mRubberBand = new QgsRubberBand( mCanvas, QgsWkbTypes::PolygonGeometry );
         mRubberBand->setFillColor( mFillColor );
         mRubberBand->setStrokeColor( mStrokeColor );
+        mInitDraggPos = e -> pos();
         break;
       case QgsMapToolIdentifyAction::SelectPolygon:
         break;
@@ -363,29 +364,28 @@ void QgsMapToolIdentifyAction::selectFeaturesMoveEvent(QgsMapMouseEvent *e)
     if ( !mDragging )
     {
         mDragging = true;
-        //mSelectRect.setTopLeft( toMapCoordinates(e->pos()).toQPointF().toPoint() );
         mSelectRect.setTopLeft( e->pos() );
     }
     mSelectRect.setBottomRight( e->pos() );
-
-    // TODO @vsklencar fix rubberband update -> e->pos cannot be transform for fn below
     QgsMapToolSelectUtils::setRubberBand( mCanvas, mSelectRect, mRubberBand );
-
 }
 
 void QgsMapToolIdentifyAction::selectFeaturesReleaseEvent(QgsMapMouseEvent *e)
 {
-    if ( !mDragging )
+    QPoint point = e->pos() - mInitDraggPos;
+    if ( !mDragging || (point.manhattanLength() < QApplication::startDragDistance()))
     {
         QPoint point = e ->pos();
         //QgsMapToolSelectUtils::expandSelectRectangle( mSelectRect, vlayer, e->pos() );
-        int boxSize = 10; //10/100/1000??
+        int boxSize = QApplication::startDragDistance()/2;
         mSelectRect.setLeft( point.x() - boxSize);
         mSelectRect.setRight( point.x() + boxSize );
         mSelectRect.setTop( point.y() - boxSize );
         mSelectRect.setBottom( point.y() + boxSize );
+        // convert point to map coordinates to get selecion
         point = toMapCoordinates (e ->pos()).toQPointF().toPoint();
         mSelectionGeometry = QgsGeometry::fromRect(QgsRectangle((double)(point.x() - boxSize), (double) (point.y() - boxSize), (double) (point.x() + boxSize), (double) (point.y() + boxSize)));
+        mDragging = false;
     }
     else {
       // Set valid values for rectangle's width and height
@@ -407,7 +407,6 @@ void QgsMapToolIdentifyAction::selectFeaturesReleaseEvent(QgsMapMouseEvent *e)
       mRubberBand = nullptr;
     }
 
-    // TODO @vsklencar transform mSelectRect for proper selection
     mSelectRect = QRect(toMapCoordinates( mSelectRect.topLeft() ).toQPointF().toPoint(), toMapCoordinates(mSelectRect.bottomRight()).toQPointF().toPoint());
     mDragging = false;
 }
