@@ -51,8 +51,8 @@ void QgsMapToolSelectPolygon::canvasMoveEvent( QgsMapMouseEvent *e )
   mSelectionHandler->canvasMoveEvent( e );
 }
 
-void QgsMapToolSelectPolygon::selectFeatures( Qt::KeyboardModifiers modifiers )
+void QgsMapToolSelectPolygon::selectFeatures( QInputEvent *e )
 {
-  QgsMapToolSelectUtils::selectMultipleFeatures( mCanvas, mSelectionHandler->selectedGeometry(), modifiers, QgisApp::instance()->messageBar() );
+  QgsMapToolSelectUtils::selectMultipleFeatures( mCanvas, mSelectionHandler->selectedGeometry(), e->modifiers(), QgisApp::instance()->messageBar() );
 }
 

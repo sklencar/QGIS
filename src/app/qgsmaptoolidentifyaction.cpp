@@ -145,6 +145,7 @@ void QgsMapToolIdentifyAction::identifyOnGeometryChange( int x, int y, IdentifyM
   resultsDialog()->updateViewModes();
 }
 
+// @vsklencar delete fn
 void QgsMapToolIdentifyAction::handleOnCanvasRelease( QgsMapMouseEvent *e )
 {
   // enable the right click for extended menu so it behaves as a contextual menu
@@ -185,8 +186,7 @@ void QgsMapToolIdentifyAction::canvasReleaseEvent( QgsMapMouseEvent *e )
   }
 
   mSelectionHandler->canvasReleaseEvent( e );
-  if ( !mSelectionHandler->selectionActive() )
-    handleOnCanvasRelease( e );
+
 }
 
 void QgsMapToolIdentifyAction::handleChangedRasterResults( QList<IdentifyResult> &results )
@@ -253,9 +253,23 @@ void QgsMapToolIdentifyAction::keyReleaseEvent( QKeyEvent *e )
   QgsMapTool::keyReleaseEvent( e );
 }
 
-void QgsMapToolIdentifyAction::identifyFromGeometry()
+void QgsMapToolIdentifyAction::identifyFromGeometry(QInputEvent *e)
 {
   QgsPointXY mapPoint = this->toMapCoordinates( mSelectionHandler->initDragPos() );
   setClickContextScope( mapPoint );
-  this->identifyOnGeometryChange( mapPoint.x(), mapPoint.y(), DefaultQgsSetting );
+  identifyMenu()->setResultsIfExternalAction( false );
+
+   // enable the right click for extended menu so it behaves as a contextual menu
+   // this would be removed when a true contextual menu is brought in QGIS
+   bool extendedMenu = e->modifiers() == Qt::ShiftModifier;
+   if (typeid(*e) == typeid(QgsMapMouseEvent))
+   {
+       QgsMapMouseEvent *me = dynamic_cast<QgsMapMouseEvent*>(e);
+       extendedMenu = extendedMenu || me->button() == Qt::RightButton;
+   }
+
+   identifyMenu()->setExecWithSingleResult( extendedMenu );
+   identifyMenu()->setShowFeatureActions( extendedMenu );
+   IdentifyMode mode = extendedMenu ? LayerSelection : DefaultQgsSetting;
+  this->identifyOnGeometryChange( mapPoint.x(), mapPoint.y(), mode );
 }

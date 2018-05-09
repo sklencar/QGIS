@@ -89,7 +89,7 @@ class APP_EXPORT QgsMapToolIdentifyAction : public QgsMapToolIdentify
     void keyReleaseEvent( QKeyEvent *e ) override;
 
     //! Method called when
-    void identifyFromGeometry();
+    void identifyFromGeometry(QInputEvent *event);
 
     friend class TestQgsMapToolIdentifyAction;
 };

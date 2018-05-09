@@ -59,7 +59,7 @@ void QgsMapToolSelectFreehand::keyReleaseEvent( QKeyEvent *e )
   QgsMapTool::keyReleaseEvent( e );
 }
 
-void QgsMapToolSelectFreehand::selectFeatures( Qt::KeyboardModifiers modifiers )
+void QgsMapToolSelectFreehand::selectFeatures( QInputEvent *e )
 {
-  QgsMapToolSelectUtils::selectMultipleFeatures( mCanvas, mSelectionHandler->selectedGeometry(), modifiers, QgisApp::instance()->messageBar() );
+  QgsMapToolSelectUtils::selectMultipleFeatures( mCanvas, mSelectionHandler->selectedGeometry(), e->modifiers(), QgisApp::instance()->messageBar() );
 }

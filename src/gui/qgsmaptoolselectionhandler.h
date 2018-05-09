@@ -75,7 +75,7 @@ class QgsDistanceWidget : public QWidget
     //! distance changed signal
     void distanceChanged( double distance );
     //! distanceEditingFinished signal
-    void distanceEditingFinished( double distance, const Qt::KeyboardModifiers &modifiers );
+    void distanceEditingFinished( double distance, QKeyEvent *event );
     //! addDistanceWidget signal
     void addDistanceWidget();
     //! distanceEditingCanceled signal
@@ -173,7 +173,7 @@ class GUI_EXPORT QgsMapToolSelectionHandler: public QObject
     //! mSelectedGeometry getter
     QgsGeometry selectedGeometry();
     //! mSelectedGeometry setter
-    void setSelectedGeometry( QgsGeometry geometry, Qt::KeyboardModifiers modifiers = Qt::NoModifier );
+    void setSelectedGeometry( QgsGeometry geometry, QInputEvent *event = nullptr );
 
     //! mSelectionMode getter
     SelectionMode selectionMode();
@@ -201,7 +201,8 @@ class GUI_EXPORT QgsMapToolSelectionHandler: public QObject
 
   signals:
     //! emitted when mSelectedGeometry has been changed
-    void geometryChanged( Qt::KeyboardModifiers modifiers = Qt::NoModifier );
+    //void geometryChanged( Qt::KeyboardModifiers modifiers = Qt::NoModifier );
+    void geometryChanged( QInputEvent *event = nullptr );
 
   private slots:
     //! update the rubber band from the input widget
@@ -211,7 +212,7 @@ class GUI_EXPORT QgsMapToolSelectionHandler: public QObject
     * triggered when the user input widget has a new value
     * either programmatically (from the mouse event) or entered by the user
     */
-    void radiusValueEntered( const double &radius, const Qt::KeyboardModifiers &modifiers );
+    void radiusValueEntered( const double &radius, QKeyEvent *event );
 
     //! cancel selecting (between two click events)
     void cancel();
