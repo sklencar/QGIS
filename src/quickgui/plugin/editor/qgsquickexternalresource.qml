@@ -39,6 +39,7 @@ Item {
     height: window.height
     width: window.width
     edge: Qt.RightEdge
+    imageButtonSize: button.height
   }
 
   Image {
@@ -47,18 +48,31 @@ Item {
     id: image
     width: 200 * QgsQuick.Utils.dp
     autoTransform: true
+    sourceSize.width: button.width
+    sourceSize.height: button.height
     fillMode: Image.PreserveAspectFit
+    visible: currentValue
 
     Component.onCompleted: image.source = getSource()
 
     function getSource() {
       if (image.status === Image.Error)
-        return QgsQuick.Utils.getThemeIcon("ic_broken_image_black")
+        return ""//QgsQuick.Utils.getThemeIcon("ic_broken_image_black")
       else if (image.currentValue && QgsQuick.Utils.fileExists(homePath + "/" + image.currentValue))
         return homePath + "/" + image.currentValue
       else
-        return QgsQuick.Utils.getThemeIcon("ic_photo_notavailable_white")
+        return ""//QgsQuick.Utils.getThemeIcon("ic_photo_notavailable_white")
     }
+  }
+
+  Image {
+      source: image.status === Image.Error ? QgsQuick.Utils.getThemeIcon("ic_broken_image_black") : QgsQuick.Utils.getThemeIcon("ic_photo_notavailable_white")
+      width: button.width
+      height: button.height
+      sourceSize.width: width
+      sourceSize.height: height
+      fillMode: Image.PreserveAspectFit
+      visible: !image.currentValue
   }
 
   Button {
@@ -66,9 +80,11 @@ Item {
     visible: fieldItem.enabled
     width: 45 * QgsQuick.Utils.dp
     height: 45 * QgsQuick.Utils.dp
+    padding: 0
 
     anchors.right: parent.right
     anchors.bottom: parent.bottom
+    anchors.verticalCenter: parent.verticalCenter
 
     onClicked: {
       photoCapturePanel.visible = true
@@ -80,6 +96,13 @@ Item {
       source: QgsQuick.Utils.getThemeIcon("ic_camera_alt_border")
       width: button.width
       height: button.height
+      sourceSize.width: width
+      sourceSize.height: height
+      fillMode: Image.PreserveAspectFit
+
+      Component.onCompleted: {
+        console.log("!!!!!", height, button.height)
+      }
     }
   }
 }

@@ -305,6 +305,10 @@ Item {
         height: childrenRect.height
         anchors { left: parent.left; right: rememberCheckbox.left; top: constraintDescriptionLabel.bottom }
 
+        Component.onCompleted: {
+            console.log("placeholder!#˜$%$#@!")
+        }
+
         Loader {
           id: attributeEditorLoader
 
@@ -328,6 +332,7 @@ Item {
         Connections {
           target: attributeEditorLoader.item
           onValueChanged: {
+            console.log("attributeEditorLoader ", attributeEditorLoader.config, EditorWidgetConfig)
             AttributeValue = isNull ? undefined : value
           }
         }

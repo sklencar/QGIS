@@ -26,6 +26,12 @@ import QgsQuick 0.1 as QgsQuick
 Item {
   signal valueChanged(var value, bool isNull)
 
+  anchors {
+    left: parent.left
+    right: parent.right
+    rightMargin: 10 * QgsQuick.Utils.dp
+  }
+
   height: childrenRect.height
 
   TextField {
@@ -37,6 +43,7 @@ Item {
     anchors.left: parent.left
     anchors.right: parent.right
     font.pointSize: 28
+    wrapMode: Text.Wrap
 
     text: value || ''
 
@@ -73,7 +80,7 @@ Item {
     anchors.left: parent.left
     anchors.right: parent.right
     font.pointSize: 28
-    wrapMode: "WordWrap"
+    wrapMode: Text.Wrap
 
     text: value || ''
     textFormat: config['UseHtml'] ? TextEdit.RichText : TextEdit.PlainText
