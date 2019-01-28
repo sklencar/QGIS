@@ -26,7 +26,9 @@ import QgsQuick 0.1 as QgsQuick
  */
 Item {
     signal valueChanged(var value, bool isNull)
+    property var customStyle: style
 
+    id: root
     height: childrenRect.height
     anchors {
       left: parent.left
@@ -43,8 +45,8 @@ Item {
         anchors { right: parent.right; left: parent.left }
 
         Item {
-            anchors { right: parent.right; left: parent.left }
-            Layout.minimumHeight: 48 * QgsQuick.Utils.dp
+            Layout.fillWidth: true
+            Layout.minimumHeight: root.customStyle.height
 
             Rectangle {
                 anchors.fill: parent
@@ -61,7 +63,12 @@ Item {
 
                 anchors.fill: parent
                 verticalAlignment: Text.AlignVCenter
-                font.pointSize: 16
+                //font.pointSize: 16 // TODO
+                font.pixelSize: root.customStyle.fontPixelSize
+                padding: 0
+                background: Rectangle {
+                    color: style.backgroundColor
+                }
 
                 inputMethodHints: Qt.ImhDigitsOnly
 
@@ -75,7 +82,6 @@ Item {
                                 else { "" }
 
                 text: {
-                    console.log("main.cureajkfsdaf", main.currentValue)
                     if ( main.currentValue === undefined )
                       {
                           qsTr('(no date)')
@@ -94,7 +100,7 @@ Item {
                       }
             }
 
-                color: main.currentValue === undefined ? 'gray' : 'black'
+                color: style.textColor //main.currentValue === undefined ? 'gray' : 'black'
 
                 MouseArea {
                     enabled: config['calendar_popup']
@@ -183,11 +189,11 @@ Item {
             if (main.currentValue === undefined)
             {
                 label.text = qsTr('(no date)')
-                label.color = 'gray'
+                label.color = style.textColor
             }
             else
             {
-                label.color = 'black'
+                label.color = style.textColor
                 label.text = new Date(value).toLocaleString(Qt.locale(), config['display_format'] )
             }
         }

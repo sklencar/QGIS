@@ -15,6 +15,7 @@
 
 import QtQuick 2.5
 import QtQuick.Controls 2.0
+import QtGraphicalEffects 1.0
 import QgsQuick 0.1 as QgsQuick
 
 /**
@@ -25,11 +26,15 @@ import QgsQuick 0.1 as QgsQuick
 Item {
   signal valueChanged(var value, bool isNull)
 
+  property var customStyle: style
   property var image: image
 
   id: fieldItem
-  anchors.left: parent.left
-  anchors.right: parent.right
+  anchors {
+    left: parent.left
+    right: parent.right
+    rightMargin: 10 * QgsQuick.Utils.dp
+  }
 
   height: Math.max(image.height, button.height)
 
@@ -46,10 +51,8 @@ Item {
     property var currentValue: value
 
     id: image
-    width: 200 * QgsQuick.Utils.dp
+    width: fieldItem.customStyle.height * 3
     autoTransform: true
-    sourceSize.width: button.width
-    sourceSize.height: button.height
     fillMode: Image.PreserveAspectFit
     visible: currentValue
 
@@ -57,15 +60,16 @@ Item {
 
     function getSource() {
       if (image.status === Image.Error)
-        return ""//QgsQuick.Utils.getThemeIcon("ic_broken_image_black")
+        return ""
       else if (image.currentValue && QgsQuick.Utils.fileExists(homePath + "/" + image.currentValue))
         return homePath + "/" + image.currentValue
       else
-        return ""//QgsQuick.Utils.getThemeIcon("ic_photo_notavailable_white")
+        return ""
     }
   }
 
   Image {
+      id: icon
       source: image.status === Image.Error ? QgsQuick.Utils.getThemeIcon("ic_broken_image_black") : QgsQuick.Utils.getThemeIcon("ic_photo_notavailable_white")
       width: button.width
       height: button.height
@@ -75,11 +79,17 @@ Item {
       visible: !image.currentValue
   }
 
+  ColorOverlay {
+      anchors.fill: icon
+      source: icon
+      color: fieldItem.customStyle.textColor
+  }
+
   Button {
     id: button
     visible: fieldItem.enabled
-    width: 45 * QgsQuick.Utils.dp
-    height: 45 * QgsQuick.Utils.dp
+    width: fieldItem.customStyle.fontPixelSize
+    height: width
     padding: 0
 
     anchors.right: parent.right
@@ -93,16 +103,19 @@ Item {
     }
 
     background: Image {
-      source: QgsQuick.Utils.getThemeIcon("ic_camera_alt_border")
+      id: cameraIcon
+      source: QgsQuick.Utils.getThemeIcon("ic_camera") // "ic_camera_alt_border"
       width: button.width
       height: button.height
       sourceSize.width: width
       sourceSize.height: height
       fillMode: Image.PreserveAspectFit
+    }
 
-      Component.onCompleted: {
-        console.log("!!!!!", height, button.height)
-      }
+    ColorOverlay {
+        anchors.fill: cameraIcon
+        source: cameraIcon
+        color: fieldItem.customStyle.textColor
     }
   }
 }

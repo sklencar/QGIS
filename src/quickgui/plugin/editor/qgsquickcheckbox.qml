@@ -15,7 +15,7 @@
 
 import QtQuick 2.0
 import QtQuick.Controls 2.2
-import QgisQuick 0.1 as QgsQuick
+import QgsQuick 0.1 as QgsQuick
 
 /**
  * Checkbox for QGIS Attribute Form
@@ -30,10 +30,12 @@ Item {
     right: parent.right
     left: parent.left
   }
+  id: fieldItem
+  property var customStyle: style
 
   CheckBox {
     property var currentValue: value
-
+    height: fieldItem.customStyle.height
     checked: value == config['CheckedState']
 
     onCheckedChanged: {

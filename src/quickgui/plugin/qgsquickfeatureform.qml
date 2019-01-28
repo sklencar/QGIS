@@ -305,10 +305,6 @@ Item {
         height: childrenRect.height
         anchors { left: parent.left; right: rememberCheckbox.left; top: constraintDescriptionLabel.bottom }
 
-        Component.onCompleted: {
-            console.log("placeholder!#˜$%$#@!")
-        }
-
         Loader {
           id: attributeEditorLoader
 
@@ -323,6 +319,7 @@ Item {
           property var field: Field
           property var constraintValid: ConstraintValid
           property var homePath: form.project ? form.project.homePath : ""
+          property var style: form.style.fields
 
           active: widget !== 'Hidden'
 
@@ -332,7 +329,6 @@ Item {
         Connections {
           target: attributeEditorLoader.item
           onValueChanged: {
-            console.log("attributeEditorLoader ", attributeEditorLoader.config, EditorWidgetConfig)
             AttributeValue = isNull ? undefined : value
           }
         }
