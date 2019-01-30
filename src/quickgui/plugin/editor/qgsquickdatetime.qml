@@ -26,9 +26,8 @@ import QgsQuick 0.1 as QgsQuick
  */
 Item {
     signal valueChanged(var value, bool isNull)
-    property var customStyle: style
 
-    id: root
+    id: fieldItem
     height: childrenRect.height
     anchors {
       left: parent.left
@@ -46,28 +45,21 @@ Item {
 
         Item {
             Layout.fillWidth: true
-            Layout.minimumHeight: root.customStyle.height
-
-            Rectangle {
-                anchors.fill: parent
-                id: backgroundRect
-                color: "#dddddd"
-                radius: 2
-
-                border.color: label.activeFocus ? "#17a81a" : "#21be2b"
-                border.width: label.activeFocus ? 2 : 1
-            }
+            Layout.minimumHeight: customStyle.height
 
             TextField {
                 id: label
 
                 anchors.fill: parent
                 verticalAlignment: Text.AlignVCenter
-                //font.pointSize: 16 // TODO
-                font.pixelSize: root.customStyle.fontPixelSize
+                font.pixelSize: customStyle.fontPixelSize
                 padding: 0
                 background: Rectangle {
-                    color: style.backgroundColor
+                    radius: customStyle.cornerRadius
+
+                    border.color: label.activeFocus ? customStyle.activeColor : customStyle.normalColor
+                    border.width: label.activeFocus ? 2 : 1
+                    color: customStyle.backgroundColor
                 }
 
                 inputMethodHints: Qt.ImhDigitsOnly
@@ -100,7 +92,7 @@ Item {
                       }
             }
 
-                color: style.textColor //main.currentValue === undefined ? 'gray' : 'black'
+                color: main.currentValue === undefined ? 'transparent' : customStyle.fontColor
 
                 MouseArea {
                     enabled: config['calendar_popup']
@@ -152,6 +144,8 @@ Item {
             focus: true
             closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutsideParent
             parent: ApplicationWindow.overlay
+            x: (window.width - width) / 2
+            y: (window.height - height) / 2
 
             ColumnLayout {
 
@@ -189,11 +183,11 @@ Item {
             if (main.currentValue === undefined)
             {
                 label.text = qsTr('(no date)')
-                label.color = style.textColor
+                label.color = customStyle.fontColor
             }
             else
             {
-                label.color = style.textColor
+                label.color = customStyle.fontColor
                 label.text = new Date(value).toLocaleString(Qt.locale(), config['display_format'] )
             }
         }

@@ -26,7 +26,6 @@ import QtQuick.Layouts 1.3
  */
 Item {
   signal valueChanged(var value, bool isNull)
-  property var customStyle: style
 
   id: fieldItem
 
@@ -40,15 +39,15 @@ Item {
 
   TextField {
     id: textField
-    height: textArea.height == 0 ? style.height : 0 //fontMetrics.height + 20 * QgsQuick.Utils.dp : 0
+    height: textArea.height == 0 ? customStyle.height : 0 //fontMetrics.height + 20 * QgsQuick.Utils.dp : 0
     topPadding: 10 * QgsQuick.Utils.dp
     bottomPadding: 10 * QgsQuick.Utils.dp
     visible: height !== 0
     anchors.left: parent.left
     anchors.right: parent.right
-    font.pixelSize: fieldItem.customStyle.fontPixelSize
+    font.pixelSize: customStyle.fontPixelSize
     wrapMode: Text.Wrap
-    color: style.textColor
+    color: customStyle.fontColor
 
     text: value || ''
     inputMethodHints: field.isNumeric || widget == 'Range' ? field.precision === 0 ? Qt.ImhDigitsOnly : Qt.ImhFormattedNumbersOnly : Qt.ImhNone
@@ -69,7 +68,7 @@ Item {
       y: textField.height - height - textField.bottomPadding / 2
       implicitWidth: 120 * QgsQuick.Utils.dp
       height: textField.activeFocus ? 2 * QgsQuick.Utils.dp : 1 * QgsQuick.Utils.dp
-      color: style.backgroundColor //textField.activeFocus ? "#4CAF50" : "#C8E6C9"
+      color: textField.activeFocus ? customStyle.backgroundColor : customStyle.backgroundColorInactive
     }
 
     onTextChanged: {
@@ -80,20 +79,24 @@ Item {
   TextArea {
     id: textArea
     height: config['IsMultiline'] === true ? undefined : 0
-    Layout.preferredHeight: fieldItem.customStyle.height
+    Layout.fillWidth: true
+    Layout.fillHeight: true
+    topPadding: customStyle.height * 0.25
+    bottomPadding: customStyle.height * 0.25
+
 
     visible: height !== 0
     anchors.left: parent.left
     anchors.right: parent.right
-    font.pixelSize: fieldItem.customStyle.fontPixelSize
+    font.pixelSize: customStyle.fontPixelSize
     wrapMode: Text.Wrap
-    color: style.textColor
+    color: customStyle.fontColor
 
     text: value || ''
     textFormat: config['UseHtml'] ? TextEdit.RichText : TextEdit.PlainText
 
     background: Rectangle {
-        color: style.backgroundColor
+        color: customStyle.backgroundColor
     }
 
     onEditingFinished: {

@@ -31,13 +31,33 @@ Item {
     left: parent.left
   }
   id: fieldItem
-  property var customStyle: style
 
   CheckBox {
     property var currentValue: value
-    height: fieldItem.customStyle.height
+    height: customStyle.height
+    id: checkBox
+    leftPadding: 0
     checked: value == config['CheckedState']
 
+    indicator: Rectangle {
+                implicitWidth: customStyle.height
+                implicitHeight: customStyle.height
+                radius: fieldItem.cornerRadius
+                border.color: checkBox.activeFocus ? customStyle.fontColor : "gray"
+                border.width: 1
+                Rectangle {
+                    visible: checkBox.checked
+                    color: customStyle.fontColor
+                    radius: fieldItem.cornerRadius
+                    anchors.margins: 4
+                    anchors.fill: parent
+                }
+
+                MouseArea {
+                    anchors.fill: parent
+                    onClicked: checkBox.currentValue = !checkBox.currentValue
+                }
+        }
     onCheckedChanged: {
       valueChanged( checked ? config['CheckedState'] : config['UncheckedState'], false )
       forceActiveFocus()

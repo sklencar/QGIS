@@ -26,7 +26,6 @@ import QgsQuick 0.1 as QgsQuick
 Item {
   signal valueChanged(var value, bool isNull)
 
-  property var customStyle: style
   property var image: image
 
   id: fieldItem
@@ -51,7 +50,7 @@ Item {
     property var currentValue: value
 
     id: image
-    width: fieldItem.customStyle.height * 3
+    width: customStyle.height * 3
     autoTransform: true
     fillMode: Image.PreserveAspectFit
     visible: currentValue
@@ -82,13 +81,13 @@ Item {
   ColorOverlay {
       anchors.fill: icon
       source: icon
-      color: fieldItem.customStyle.textColor
+      color: customStyle.fontColor
   }
 
   Button {
     id: button
-    visible: fieldItem.enabled
-    width: fieldItem.customStyle.fontPixelSize
+    visible: enabled
+    width: customStyle.height
     height: width
     padding: 0
 
@@ -115,7 +114,7 @@ Item {
     ColorOverlay {
         anchors.fill: cameraIcon
         source: cameraIcon
-        color: fieldItem.customStyle.textColor
+        color: customStyle.fontColor
     }
   }
 }

@@ -26,7 +26,6 @@ import QgsQuick 0.1 as QgsQuick
 Item {
   signal valueChanged(var value, bool isNull)
   id: fieldItem
-  property var customStyle: style
 
   anchors {
     left: parent.left
@@ -34,7 +33,7 @@ Item {
     rightMargin: 10 * QgsQuick.Utils.dp
   }
 
-  height: fieldItem.customStyle.height
+  height: customStyle.height
 
   ComboBox {
     id: comboBox
@@ -108,7 +107,7 @@ Item {
       height: comboBox.height * 0.8
       text: config['map'].length ? model.text : modelData
       font.weight: comboBox.currentIndex === index ? Font.DemiBold : Font.Normal
-      font.pixelSize: fieldItem.customStyle.fontPixelSize
+      font.pixelSize: customStyle.fontPixelSize
       highlighted: comboBox.highlightedIndex == index
       leftPadding: 5 * QgsQuick.Utils.dp
     }
@@ -116,12 +115,12 @@ Item {
     contentItem: Text {
       height: comboBox.height * 0.8
       text: comboBox.displayText
-      font.pixelSize: fieldItem.customStyle.fontPixelSize * 0.8
+      font.pixelSize: customStyle.fontPixelSize
       horizontalAlignment: Text.AlignLeft
       verticalAlignment: Text.AlignVCenter
       elide: Text.ElideRight
       leftPadding: 5 * QgsQuick.Utils.dp
-      color: fieldItem.customStyle.textColor
+      color: customStyle.fontColor
     }
 
     background: Item {
@@ -131,10 +130,10 @@ Item {
       Rectangle {
         anchors.fill: parent
         id: backgroundRect
-        border.color: comboBox.pressed ? "#17a81a" : "#21be2b"
+        border.color: comboBox.pressed ? customStyle.activeColor : customStyle.normalColor
         border.width: comboBox.visualFocus ? 2 : 1
-        color: fieldItem.customStyle.backgroundColor
-        radius: 2
+        color: customStyle.backgroundColor
+        radius: customStyle.cornerRadius
       }
     }
     // [/hidpi fixes]

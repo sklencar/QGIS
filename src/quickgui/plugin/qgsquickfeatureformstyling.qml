@@ -46,10 +46,14 @@ QtObject {
   }
 
     property QtObject fields: QtObject {
-      property color textColor: "black"
+      property color fontColor: "black"
       property color backgroundColor: "grey"
-      property real height: 80 * QgsQuick.Utils.dp
+      property color backgroundColorInactive: "grey"
+      property color activeColor: "#1B5E20"
+      property color normalColor: "#4CAF50"
+      property real height: 48 * QgsQuick.Utils.dp
       property real cornerRadius: 1
-      property int fontPixelSize: 80 * QgsQuick.Utils.dp
+      property int fontPixelSize: 48 * QgsQuick.Utils.dp
+
     }
 }
