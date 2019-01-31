@@ -103,7 +103,7 @@ Item {
 
     background: Image {
       id: cameraIcon
-      source: QgsQuick.Utils.getThemeIcon("ic_camera") // "ic_camera_alt_border"
+      source: QgsQuick.Utils.getThemeIcon("ic_camera")
       width: button.width
       height: button.height
       sourceSize.width: width

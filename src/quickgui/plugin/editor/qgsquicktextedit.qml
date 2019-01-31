@@ -39,7 +39,7 @@ Item {
 
   TextField {
     id: textField
-    height: textArea.height == 0 ? customStyle.height : 0 //fontMetrics.height + 20 * QgsQuick.Utils.dp : 0
+    height: textArea.height == 0 ? customStyle.height : 0
     topPadding: 10 * QgsQuick.Utils.dp
     bottomPadding: 10 * QgsQuick.Utils.dp
     visible: height !== 0
@@ -104,8 +104,4 @@ Item {
     }
   }
 
-  FontMetrics {
-    id: fontMetrics
-    font: textField.font
-  }
 }

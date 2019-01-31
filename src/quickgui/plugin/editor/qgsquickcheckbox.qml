@@ -42,13 +42,13 @@ Item {
     indicator: Rectangle {
                 implicitWidth: customStyle.height
                 implicitHeight: customStyle.height
-                radius: fieldItem.cornerRadius
-                border.color: checkBox.activeFocus ? customStyle.fontColor : "gray"
+                radius: customStyle.cornerRadius
+                border.color: checkBox.activeFocus ? customStyle.fontColor : "grey"
                 border.width: 1
                 Rectangle {
                     visible: checkBox.checked
                     color: customStyle.fontColor
-                    radius: fieldItem.cornerRadius
+                    radius: customStyle.cornerRadius
                     anchors.margins: 4
                     anchors.fill: parent
                 }

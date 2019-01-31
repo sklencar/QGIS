@@ -103,17 +103,14 @@ Drawer {
       anchors.fill: parent
       autoOrientation: true
 
-      Rectangle {
+      Item {
         id: captureButton
-        property int borderWidth: 10 * QgsQuick.Utils.dp
         width: buttonSize
         height: buttonSize
-        color: "transparent" //photoPanel.bgColor
-        //border.color: photoPanel.borderColor
+        //color: "transparent"
         anchors.right: parent.right
         anchors.verticalCenter: parent.verticalCenter
-        //border.width: borderWidth
-        radius: width*0.5
+        //radius: width*0.5
         antialiasing: true
 
         MouseArea {
@@ -134,9 +131,9 @@ Drawer {
           id: captureButtonImage
           fillMode: Image.PreserveAspectFit
           anchors.centerIn: parent
-          sourceSize.height: imageButtonSize //captureButton.height/2
-          sourceSize.width: imageButtonSize //captureButton.height/2
-          height: imageButtonSize //captureButton.height/2
+          sourceSize.height: imageButtonSize
+          sourceSize.width: imageButtonSize
+          height: imageButtonSize
           source: photoPanel.captureButtonIcon
         }
 
