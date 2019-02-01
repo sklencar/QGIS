@@ -65,10 +65,11 @@ Item {
     ]
 
     background: Rectangle {
-      y: textField.height - height - textField.bottomPadding / 2
-      implicitWidth: 120 * QgsQuick.Utils.dp
-      height: textField.activeFocus ? 2 * QgsQuick.Utils.dp : 1 * QgsQuick.Utils.dp
-      color: textField.activeFocus ? customStyle.backgroundColor : customStyle.backgroundColorInactive
+        anchors.fill: parent
+        border.color: comboBox.pressed ? customStyle.activeColor : customStyle.normalColor
+        border.width: comboBox.visualFocus ? 2 : 1
+        color: customStyle.backgroundColor
+        radius: customStyle.cornerRadius
     }
 
     onTextChanged: {
