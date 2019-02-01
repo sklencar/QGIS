@@ -107,10 +107,8 @@ Drawer {
         id: captureButton
         width: buttonSize
         height: buttonSize
-        //color: "transparent"
         anchors.right: parent.right
         anchors.verticalCenter: parent.verticalCenter
-        //radius: width*0.5
         antialiasing: true
 
         MouseArea {
