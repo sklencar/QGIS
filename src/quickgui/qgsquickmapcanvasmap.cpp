@@ -66,6 +66,7 @@ void QgsQuickMapCanvasMap::zoom( QPointF center, qreal scale )
   // same as zoomWithCenter (no coordinate transformations are needed)
   extent.scale( scale, &newCenter );
   mMapSettings->setExtent( extent );
+  mNeedsRefresh = true;
 }
 
 void QgsQuickMapCanvasMap::pan( QPointF oldPos, QPointF newPos )
@@ -85,6 +86,7 @@ void QgsQuickMapCanvasMap::pan( QPointF oldPos, QPointF newPos )
   extent.setYMinimum( extent.yMinimum() + dy );
 
   mMapSettings->setExtent( extent );
+  mNeedsRefresh = true;
 }
 
 void QgsQuickMapCanvasMap::refreshMap()
@@ -256,8 +258,13 @@ void QgsQuickMapCanvasMap::setFreeze( bool freeze )
 
   mFreeze = freeze;
 
-  if ( !mFreeze )
+  if ( !mFreeze && mNeedsRefresh )
+  {
     refresh();
+  }
+
+  // we are freezing or unfreezing - either way we can reset "needs refresh"
+  mNeedsRefresh = false;
 
   emit freezeChanged();
 }
