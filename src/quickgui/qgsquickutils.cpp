@@ -107,7 +107,7 @@ QString QgsQuickUtils::getRelativePath( const QString &path, const QString &pref
   if ( resultPath.startsWith( filePrefixPath ) )
     return resultPath.replace( filePrefixPath, QString() );
 
-  return resultPath;
+  return QString();
 }
 
 void QgsQuickUtils::logMessage( const QString &message, const QString &tag, Qgis::MessageLevel level )
